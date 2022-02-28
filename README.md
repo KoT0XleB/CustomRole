@@ -4,7 +4,7 @@
 ### For example: Janitor
 ```
 - Name_Role: Janitor
-  Info_Console: <color=yellow>You're a janitor. You clean up here. You have more HP and a janitor card.</color>
+  Info_Console: <color=yellow>You're a janitor. You clean up here. Check more info in [~]</color>
   Broadcast_Role: >-
     <color=yellow>You're a janitor. You clean up here.
      You have more HP and a janitor card.</color>
