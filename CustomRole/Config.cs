@@ -39,38 +39,6 @@ namespace CustomRole
                 HowNeedPeople_ToSpawnRole = 1,
                 HowMuchPeople_CanBeSpawn = 1,
                 NameOfEvent_ForSpawn = "RoundStart"
-            },
-            new MakeRole()
-            {
-                Name_Role = "FBI",
-                Info_Console = "You have become a FBI\nHelp MTF and save the scientists.",
-                Broadcast_Role = "You the FBI. Press [`] for more information.",
-                Role_Color = "yellow",
-                Items_Role =
-                {
-                    ItemType.GunE11SR,
-                    ItemType.GunCOM18,
-                    ItemType.KeycardChaosInsurgency,
-                    ItemType.Medkit,
-                    ItemType.Flashlight,
-                    ItemType.GrenadeHE,
-                },
-                Class_Role = RoleType.NtfSpecialist,
-                Hp_Role = 120,
-                Who_CanBe =
-                {
-                    //RoleType.Spectator
-                    RoleType.NtfCaptain,
-                    RoleType.NtfPrivate,
-                    RoleType.NtfSergeant,
-                    RoleType.NtfSpecialist
-                },
-                Spawn_Chance_Role = 50,
-                Spawn_Room = RoomType.Surface,
-                RoomSurface_SpawnPosition = new Vector3(0f, 0f, 0f),
-                HowNeedPeople_ToSpawnRole = 10,
-                HowMuchPeople_CanBeSpawn = 10,
-                NameOfEvent_ForSpawn = "TeamRespawn"
             }
         };
         public class MakeRole
