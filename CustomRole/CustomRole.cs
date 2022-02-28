@@ -1,6 +1,8 @@
 ﻿using MEC;
 using Qurre;
+using Qurre.API;
 using Qurre.API.Events;
+using Qurre.API.Objects;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -14,7 +16,7 @@ namespace CustomRole
     {
         public override string Developer => "KoT0XleB#4663";
         public override string Name => "CustomRole";
-        public override Version Version => new Version(1, 0, 0);
+        public override Version Version => new Version(1, 1, 0);
         public override int Priority => 20;
         public override void Enable() => RegisterEvents();
         public override void Disable() => UnregisterEvents();
@@ -26,6 +28,8 @@ namespace CustomRole
             if (!CustomConfig.IsEnable) return;
 
             Qurre.Events.Round.Start += OnRoundStarted;
+            Qurre.Events.Round.TeamRespawn += OnTeamRespawning;
+
             Qurre.Events.Player.Dead += OnDead;
             Qurre.Events.Player.RoleChange += OnRoleChanging;
         }
@@ -35,40 +39,66 @@ namespace CustomRole
             if (!CustomConfig.IsEnable) return;
 
             Qurre.Events.Round.Start -= OnRoundStarted;
+            Qurre.Events.Alpha.Detonated -= OnDetonated;
+            Qurre.Events.Round.TeamRespawn -= OnTeamRespawning;
+
             Qurre.Events.Player.Dead -= OnDead;
             Qurre.Events.Player.RoleChange -= OnRoleChanging;
         }
         public void OnRoundStarted()
         {
-            foreach (var list in CustomConfig.MakingRoles)
+            CreatingRole("RoundStart");
+        }
+        public void OnTeamRespawning(TeamRespawnEvent ev)
+        {
+            Timing.CallDelayed(1f, () =>
             {
-                if (list.spawn_chance_role >= Random.Range(0, 100))
+                CreatingRole("TeamRespawn");
+            });
+        }
+        public void OnDetonated()
+        {
+            Timing.CallDelayed(1f, () =>
+            {
+                CreatingRole("Detonate");
+            });
+        }
+        public void CreatingRole(string NameOfEvent)
+        {
+            foreach (var list in CustomConfig.MakingRoles.Where(ev => ev.NameOfEvent_ForSpawn == NameOfEvent && Player.List.Count() >= ev.HowNeedPeople_ToSpawnRole))
+            {
+                if (list.Spawn_Chance_Role >= Random.Range(0, 100))
                 {
-                    var people_count = list.howmuchpeople_canbe;
+                    var people_count = list.HowMuchPeople_CanBeSpawn;
                     while (people_count > 0)
                     {
                         Player player = GetRandomPlayer();
-                        if (player.Team != Team.SCP && player.Role == list.who_canbe)
+                        if (player.Team != Team.SCP && list.Who_CanBe.Contains(player.Role))
                         {
                             PlayerList.Contains(player);
 
                             player.ClearBroadcasts();
-                            player.Broadcast(list.broadcast_role, 10);
-                            player.SendConsoleMessage(list.info_console, "green");
+                            player.Broadcast(list.Broadcast_Role, 10);
+                            player.SendConsoleMessage(list.Info_Console, "green");
 
-                            player.Role = list.class_role;
-                            player.RoleName = list.name_role;
-                            player.MaxHp = list.hp_role;
+                            player.Role = list.Class_Role;
+                            player.RoleName = list.Name_Role;
+                            player.RoleColor = list.Role_Color;
+                            player.MaxHp = list.Hp_Role;
                             player.Hp = player.MaxHp;
 
-                            foreach (var item in list.items_role)
+                            foreach (var item in list.Items_Role)
                             {
                                 player.AddItem(item);
                             }
 
                             Timing.CallDelayed(1f, () =>
                             {
-                                player.TeleportToRoom(list.spawn_room);
+                                if (list.Spawn_Room == RoomType.Surface)
+                                {
+                                    player.Position = list.RoomSurface_SpawnPosition;
+                                }
+                                else player.TeleportToRoom(list.Spawn_Room);
                             });
                         }
                         PlayerList.Remove(player);
